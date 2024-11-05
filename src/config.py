@@ -8,3 +8,7 @@ DB_PORT=os.environ.get('DB_PORT')
 DB_HOST=os.environ.get('DB_HOST')
 DB_PASS=os.environ.get('DB_PASS')
 DB_USER=os.environ.get('DB_USER')
+
+
+SECRET_KEY=os.environ.get("SECRET_KEY")
+ALGORITHM=os.environ.get("ALGORITHM")

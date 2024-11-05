@@ -39,18 +39,19 @@ class User(Base):
         default='example@gmail.com',
         nullable=False
     )
-    hashed_password: Mapped[str] = mapped_column(
+    password: Mapped[str] = mapped_column(
         String,
         nullable=False
     )
     registred_at: Mapped[str] = mapped_column(
         TIMESTAMP,
-        default=datetime.datetime.now(datetime.UTC),
+        default=datetime.datetime.utcnow,
         nullable=False
     )
     role_id: Mapped[int] = mapped_column(
         Integer,
-        ForeignKey("role.id")
+        ForeignKey("role.id"),
+        default=1
     )
     is_active: Mapped[bool] = mapped_column(
         Boolean,
