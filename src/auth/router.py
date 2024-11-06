@@ -30,7 +30,7 @@ async def register_user(user_data: UserCreate) -> dict:
     
     
 @router.post('/login/')
-async def authenticate_user(response: Response, user_data: UserAuth):
+async def authenticate_user(response: Response, user_data: UserAuth) -> dict:
     async with async_session() as session:
         user_id = await get_user_id(session, user_data.email)
         if user_id is None:
@@ -51,12 +51,12 @@ async def authenticate_user(response: Response, user_data: UserAuth):
         return {'access_token': access_token, 'refresh_token': None}
     
 
-@router.get('/me/')
+@router.get('/me/', response_model=User)
 async def get_me(user_data: User = Depends(get_current_user)):
     return user_data
 
 
 @router.post('/logout/')
-async def logout_user(response: Response):
+async def logout_user(response: Response) -> dict:
     response.delete_cookie(key='users_access_token')
     return {'message': 'Пользователь успешно вышел из системы'}
