@@ -7,7 +7,7 @@ Delete
 
 
 from typing import Annotated
-from sqlalchemy import select, update, insert
+from sqlalchemy import select, update, insert, delete
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from fastapi import Depends
 
@@ -19,7 +19,7 @@ session_db = Annotated[async_sessionmaker, Depends(get_async_session)]
 
 
 #Create
-async def create_user(session: session_db, user_in: UserCreate) -> dict:
+async def create_user(session: AsyncSession, user_in: UserCreate) -> dict:
     stmt = insert(User).values(**user_in.model_dump())
     await session.execute(stmt)
     await session.commit()
@@ -33,7 +33,7 @@ async def create_user(session: session_db, user_in: UserCreate) -> dict:
 #     users = result.scalars().all()
 #     return list(users)
 
-async def get_user_id(session: session_db, user_email: str) -> int | None:
+async def get_user_id(session: AsyncSession, user_email: str) -> int | None:
     stmt = select(User.id).where(user_email==User.email)
     result = await session.execute(stmt)
     user_id = result.scalars().all()
@@ -61,13 +61,17 @@ async def get_user(session: AsyncSession, user_id: int) -> User | None:
 
 
 #Update
-async def update_user(session: session_db, user_old_id: int, user_new: UserUpdate) -> User: #TODO
+async def update_user(session: AsyncSession, user_old_id: int, user_new: UserUpdate) -> User:
     new_user_dict = user_new.model_dump(exclude_unset=True)
-    stmt = update(User).where(User.id == user_old_id).values(new_user_dict).returning(User) #TODO
+    stmt = update(User).where(User.id == user_old_id).values(new_user_dict).returning(User)
     result = await session.execute(stmt)
     await session.commit()
     return result.first()
 
 #Delete
-async def delete_user(session: session_db, user_id: int) -> dict:
-    pass #TODO
+async def delete_user(session: AsyncSession, user_id: int) -> dict:
+    stmt = delete(User).where(User.id==user_id)
+    await session.execute(stmt)
+    await session.commit()
+    return {'message': 'success'}
+    
